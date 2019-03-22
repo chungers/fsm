@@ -43,7 +43,7 @@ func simpleProvisionModel(actions map[Signal]Action) Machines {
 			Actions: map[Signal]Action{
 				create: actions[create],
 			},
-			TTL: Expiry{3, create},
+			TTL: Expiry{TTL: 3, Raise: create},
 		},
 		State{
 			Index: creating,
@@ -84,7 +84,7 @@ func simpleProvisionModel(actions map[Signal]Action) Machines {
 				cordon:    actions[cordon],
 				terminate: actions[terminate],
 			},
-			TTL: Expiry{5, cordon},
+			TTL: Expiry{TTL: 5, Raise: cordon},
 		},
 		State{
 			Index: cordoned,
@@ -147,7 +147,7 @@ func (c *cluster) countByState(state Index) int {
 	for i := range c.nodes {
 		for j := range c.nodes[i] {
 			if c.nodes[i][j].State() == state {
-				total += 1
+				total++
 			}
 		}
 	}

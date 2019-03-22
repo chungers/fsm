@@ -74,7 +74,7 @@ func TestClusterCases(t *testing.T) {
 	machines, err := Define(
 		State{
 			Index: start,
-			TTL:   Expiry{noData, timeout},
+			TTL:   Expiry{TTL: noData, Raise: timeout},
 			Transitions: map[Signal]Index{
 				agentReady: matchedAgent,
 				agentDown:  matchedAgent,
@@ -84,7 +84,7 @@ func TestClusterCases(t *testing.T) {
 		},
 		State{
 			Index: matchedInstance,
-			TTL:   Expiry{agentJoin, agentGone},
+			TTL:   Expiry{TTL: agentJoin, Raise: agentGone},
 			Transitions: map[Signal]Index{
 				agentReady:   clusterNode,
 				agentDown:    clusterNode,
@@ -97,7 +97,7 @@ func TestClusterCases(t *testing.T) {
 		},
 		State{
 			Index: pendingInstanceDestroy,
-			TTL:   Expiry{waitBeforeInstanceDestroy, reap},
+			TTL:   Expiry{TTL: waitBeforeInstanceDestroy, Raise: reap},
 			Transitions: map[Signal]Index{
 				agentReady:   clusterNode, // late joiner
 				agentDown:    clusterNode,
@@ -111,7 +111,7 @@ func TestClusterCases(t *testing.T) {
 		},
 		State{
 			Index: matchedAgent,
-			TTL:   Expiry{waitDescribeInstances, instanceGone},
+			TTL:   Expiry{TTL: waitDescribeInstances, Raise: instanceGone},
 			Transitions: map[Signal]Index{
 				instanceOK:   clusterNode,
 				instanceGone: removedInstance,
@@ -140,7 +140,7 @@ func TestClusterCases(t *testing.T) {
 		},
 		State{
 			Index: clusterNodeDown,
-			TTL:   Expiry{waitBeforeReprovision, agentGone},
+			TTL:   Expiry{TTL: waitBeforeReprovision, Raise: agentGone},
 			Transitions: map[Signal]Index{
 				agentReady:   clusterNodeReady,
 				agentGone:    pendingInstanceDestroy,
@@ -149,7 +149,7 @@ func TestClusterCases(t *testing.T) {
 		},
 		State{
 			Index: removedInstance, // after we removed the instance, we can still have unmatched node
-			TTL:   Expiry{waitBeforeCleanup, timeout},
+			TTL:   Expiry{TTL: waitBeforeCleanup, Raise: timeout},
 			Transitions: map[Signal]Index{
 				agentDown: done,
 				timeout:   done,

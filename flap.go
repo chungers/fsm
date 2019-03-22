@@ -38,7 +38,7 @@ func (s *spec) compileFlapping(checks []Flap) (*spec, error) {
 		// check the state
 		for _, state := range check.States {
 			if _, has := s.states[state]; !has {
-				return nil, ErrUnknownState(state)
+				return nil, ErrUnknownState{spec: s, Index: state}
 			}
 		}
 
