@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	defaultBufferSize = 100
+	defaultBufferSize = 1 << 8
 )
 
 // runner manages the channels used to receive state transition signals
@@ -101,8 +101,7 @@ func (g *runner) handleError(tid int64, err error, ctx interface{}) {
 		if g.options.IgnoreUndefinedStates {
 			return
 		}
-		message = fmt.Sprintf("%s: %v", err.Error(),
-			g.spec.stateName(Index(err)))
+		message = fmt.Sprintf("Unknown: %v", err)
 
 	case ErrUnknownTransition:
 		if g.options.IgnoreUndefinedTransitions {
@@ -115,12 +114,11 @@ func (g *runner) handleError(tid int64, err error, ctx interface{}) {
 		if g.options.IgnoreUndefinedSignals {
 			return
 		}
-		message = fmt.Sprintf("%s: state(%v) on signal(%v)", err.Error(),
-			g.spec.stateName(Index(err.State)), g.spec.signalName(Signal(err.Signal)))
+		message = fmt.Sprintf("UnknownSignal: %v, state(%v) on signal(%v)", err,
+			g.spec.stateName(Index(err.Index)), g.spec.signalName(Signal(err.Signal)))
 
 	case ErrDuplicateState:
-		message = fmt.Sprintf("%s: %v", err.Error(),
-			g.spec.stateName(Index(err)))
+		message = fmt.Sprintf("Duplicate: %v", err)
 
 	case ErrUnknownFSM:
 		message = fmt.Sprintf("%s: %v", err.Error(), err)

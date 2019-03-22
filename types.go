@@ -1,5 +1,9 @@
 package fsm // import "github.com/orkestr8/fsm"
 
+import (
+	"fmt"
+)
+
 // ID is the id of the instance in a given set.  It's unique in that set.
 type ID uint64
 
@@ -127,20 +131,11 @@ type Logger interface {
 
 // Backgrounder runs in the background
 type Backgrounder interface {
-	// Run starts the backgrounder
-	//	Run() error
 	// Stop stops the state machine loop
 	Stop()
 }
 
-// Runner is the interface for managing instances
-type Runner interface {
-	Backgrounder
-
-	// Alloc allocates an instance of FSM for tracking of state
-	//	Alloc(Index) (FSM, error)
-}
-
+// Machines is the main interface to allocate new instances and to start tracking the states.
 type Machines interface {
 
 	// New allocates an instance of FSM for tracking of state
@@ -151,4 +146,10 @@ type Machines interface {
 
 	// Done stops everything and releases all resources
 	Done()
+
+	// StateStringer returns the state in printable form
+	StateStringer(Index) fmt.GoStringer
+
+	// SignalStringer returns the signal in printable form
+	SignalStringer(Signal) fmt.GoStringer
 }

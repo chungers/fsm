@@ -1,5 +1,9 @@
 package fsm // import "github.com/orkestr8/fsm"
 
+import (
+	"fmt"
+)
+
 type machines struct {
 	*spec
 	Options
@@ -36,4 +40,18 @@ func (m *machines) Done() {
 	}
 
 	m.runner.Stop()
+}
+
+type stringer string
+
+func (s stringer) GoString() string {
+	return string(s)
+}
+
+func (m *machines) StateStringer(i Index) fmt.GoStringer {
+	return stringer(m.spec.stateName(i))
+}
+
+func (m *machines) SignalStringer(s Signal) fmt.GoStringer {
+	return stringer(m.spec.signalName(s))
 }

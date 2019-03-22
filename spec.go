@@ -30,7 +30,7 @@ func (s *spec) build(state State, more ...State) (*spec, error) {
 
 	for _, st := range more {
 		if _, has := states[st.Index]; has {
-			err := ErrDuplicateState(st.Index)
+			err := ErrDuplicateState{spec: s, Index: st.Index}
 			return s, err
 		}
 		states[st.Index] = st
@@ -58,7 +58,7 @@ func (s *spec) compile(m map[Index]State) (map[Signal]Signal, error) {
 		} {
 			for signal, next := range transfer {
 				if _, has := m[next]; !has {
-					return nil, ErrUnknownState(next)
+					return nil, ErrUnknownState{spec: s, Index: next}
 				}
 				signals[signal] = signal
 			}
@@ -79,7 +79,7 @@ func (s *spec) compile(m map[Index]State) (map[Signal]Signal, error) {
 			}
 
 			if _, has := signals[signal]; !has {
-				return nil, ErrUnknownSignal{Signal: signal, State: st.Index}
+				return nil, ErrUnknownSignal{Signal: signal, Index: st.Index}
 			}
 		}
 	}
@@ -90,7 +90,7 @@ func (s *spec) compile(m map[Index]State) (map[Signal]Signal, error) {
 		if st.TTL.TTL > 0 {
 			if _, has := st.Transitions[st.TTL.Raise]; !has {
 				return nil, ErrUnknownSignal{
-					spec: s, Signal: st.TTL.Raise, State: st.Index,
+					spec: s, Signal: st.TTL.Raise, Index: st.Index,
 					Help: "expiry raises signal that's not in state's transitions",
 				}
 			}
@@ -102,7 +102,7 @@ func (s *spec) compile(m map[Index]State) (map[Signal]Signal, error) {
 		if st.Visit.Value > 0 {
 			if _, has := st.Transitions[st.Visit.Raise]; !has {
 				return nil, ErrUnknownSignal{
-					spec: s, Signal: st.Visit.Raise, State: st.Index,
+					spec: s, Signal: st.Visit.Raise, Index: st.Index,
 					Help: "visit limit raises signal that's not in state's transitions",
 				}
 			}
@@ -164,7 +164,7 @@ func (s *spec) SetAction(state Index, signal Signal, action Action) error {
 func (s *spec) expiry(current Index) (expiry *Expiry, err error) {
 	state, has := s.states[current]
 	if !has {
-		err = ErrUnknownState(current)
+		err = ErrUnknownState{spec: s, Index: current}
 		return
 	}
 	if state.TTL.TTL > 0 {
@@ -177,7 +177,7 @@ func (s *spec) expiry(current Index) (expiry *Expiry, err error) {
 func (s *spec) visit(next Index) (limit *Limit, err error) {
 	state, has := s.states[next]
 	if !has {
-		err = ErrUnknownState(next)
+		err = ErrUnknownState{spec: s, Index: next}
 		return
 	}
 
@@ -191,13 +191,13 @@ func (s *spec) visit(next Index) (limit *Limit, err error) {
 func (s *spec) error(current Index, signal Signal) (next Index, err error) {
 	state, has := s.states[current]
 	if !has {
-		err = ErrUnknownState(current)
+		err = ErrUnknownState{spec: s, Index: current}
 		return
 	}
 
 	_, has = s.signals[signal]
 	if !has {
-		err = ErrUnknownSignal{Signal: signal, State: current}
+		err = ErrUnknownSignal{Signal: signal, Index: current}
 		return
 	}
 
@@ -218,7 +218,7 @@ func (s *spec) transition(current Index, signal Signal) (next Index, action Acti
 
 	state, has := s.states[current]
 	if !has {
-		err = ErrUnknownState(current)
+		err = ErrUnknownState{spec: s, Index: current}
 		return
 	}
 

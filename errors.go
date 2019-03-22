@@ -5,17 +5,23 @@ import (
 )
 
 // ErrDuplicateState is thrown when there are indexes of the same value
-type ErrDuplicateState Index
+type ErrDuplicateState struct {
+	*spec
+	Index
+}
 
 func (e ErrDuplicateState) Error() string {
-	return fmt.Sprintf("duplicated state index: %v", e)
+	return fmt.Sprintf("duplicated state index: %v", e.spec.stateName(e.Index))
 }
 
 // ErrUnknownState indicates the state referenced does not match a known state index
-type ErrUnknownState Index
+type ErrUnknownState struct {
+	*spec
+	Index
+}
 
 func (e ErrUnknownState) Error() string {
-	return fmt.Sprintf("unknown state: %v", e)
+	return fmt.Sprintf("unknown state: %v", e.spec.stateName(e.Index))
 }
 
 // ErrUnknownTransition indicates an unknown signal while in given state is raised
@@ -32,14 +38,14 @@ func (e ErrUnknownTransition) Error() string {
 
 // ErrUnknownSignal is raised when a undefined signal is received in the given state
 type ErrUnknownSignal struct {
-	spec   *spec
-	Signal Signal
-	State  Index
-	Help   string
+	spec *spec
+	Signal
+	Index
+	Help string
 }
 
 func (e ErrUnknownSignal) Error() string {
-	return fmt.Sprintf("unknown signal: signal=%v, state=%v", e.spec.signalName(e.Signal), e.spec.stateName(e.State))
+	return fmt.Sprintf("unknown signal: signal=%v, state=%v", e.spec.signalName(e.Signal), e.spec.stateName(e.Index))
 }
 
 // ErrUnknownFSM is raised when the ID is does not match any thing in the set
