@@ -90,6 +90,8 @@ are:
   + `RUNNING`: running state, where the ping of the service (e.g. in Window 4 and 5) returns 200.
   + `DOWN`: state when the target isn't running.
   + `ERROR`: state when the target returns an error code.  You can control this by doing a HTTP GET to `/httpStatus?code=500`, for example, to set all subsequent pings at `/` to return 500.
+  + `PROVISIONING` : state when the service / target is coming up.
+  + `STOPPING` : state when the service / target is being shut down.  A shutdown signal is implemented simply via HTTP GET `/kill`.
 
 Starting the :7070 will eventually start up the entire graph of servers:
 
