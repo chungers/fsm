@@ -210,7 +210,7 @@ func (a *simple) initialize() (err error) {
 			Transitions: map[fsm.Signal]fsm.Index{
 				foundRunning: targetRunning,
 				foundError:   targetError,
-				doProvision:  targetRunning,
+				doProvision:  targetProvisioning,
 			},
 			TTL: fsm.Expiry{TTL: 5, Raise: doProvision},
 			Actions: map[fsm.Signal]fsm.Action{
@@ -444,6 +444,8 @@ func (a *simple) provision(target string) error {
 	if !has {
 		return fmt.Errorf("Target not found %v", target)
 	}
+
+	a.signal(target, doProvision)
 
 	p := strings.Split(cmd, " ")
 
