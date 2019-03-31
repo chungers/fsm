@@ -12,8 +12,8 @@ ifeq (${DISABLE_OPTIMIZATION},true)
 endif
 
 .PHONY: clean vet lint
-.DEFAULT: sentry
-all: clean vet lint sentry
+.DEFAULT: simple
+all: clean vet lint simple
 
 AUTHORS: .mailmap .git/HEAD
 	git log --format='%aN <%aE>' | sort -fu > $@
@@ -30,18 +30,17 @@ lint:
 
 clean:
 	@echo "+ $@"
-	rm -rf build
-	mkdir -p build
+	@rm -rf build
+	@mkdir -p build
 
 define binary_target_template
 $(1): $(1).go lint vet
-	$(eval HASH := $(shell git hash-object $(1).go))  # hash of source code
-	@echo "$@"
+	@$(eval HASH := $(shell git hash-object $(1).go))
+	@echo "+ build/$(1) hash=$(HASH)"
 	@mkdir -p build
 ifneq (,$(findstring .m,$(VERSION)))
 		@echo "\nWARNING - repository contains uncommitted changes, tagged binaries as dirty\n"
 endif
-	@echo "\nBuilding $(1).go with hash=$(HASH)"
 	go build -o build/$(1) \
 		-tags "$(GO_BUILD_TAGS)" \
 		-ldflags "\
@@ -61,4 +60,4 @@ endef
 # Sentry is the example that shows how to use the fsm in a server that
 # is able to watch over a set of other http servers and start them
 # if necessary.
-$(call define_binary_target,sentry)
+$(call define_binary_target,simple)
