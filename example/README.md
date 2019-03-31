@@ -97,6 +97,9 @@ Starting the :7070 will eventually start up the entire graph of servers:
 build/simple simple-7070.conf :7070
 ```
 
+Here's an example of the watch sessions:
+
+![screen](screen.png)
 
 
 
