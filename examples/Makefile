@@ -57,7 +57,7 @@ endef
 
 # All the possible targets
 
-# Sentry is the example that shows how to use the fsm in a server that
+# Simple is the example that shows how to use the fsm in a server that
 # is able to watch over a set of other http servers and start them
 # if necessary.
 $(call define_binary_target,simple)

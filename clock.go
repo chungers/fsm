@@ -1,8 +1,6 @@
 package fsm // import "github.com/orkestr8/fsm"
 
 import (
-	//	"fmt"
-	//	"os"
 	"sync"
 	"time"
 )
@@ -29,17 +27,19 @@ func NewClock() *Clock {
 	}
 	clock.driver = func() {
 		<-clock.start
-		clock.start = nil
+		clock.synchronized(func(c *Clock) { c.start = nil })
 
-		for {
-			select {
-			case <-clock.stop:
-				close(clock.c)
-				return
-			}
-		}
+		<-clock.stop
+		clock.synchronized(func(c *Clock) { close(clock.c); c.start = nil })
+
 	}
 	return clock.run()
+}
+
+func (t *Clock) synchronized(f func(*Clock)) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+	f(t)
 }
 
 // Start starts the clock
@@ -48,7 +48,7 @@ func (t *Clock) Start() {
 	defer t.lock.Unlock()
 
 	if t.start == nil {
-		return // not properly initialized
+		return
 	}
 
 	// Start should be idempotent.
@@ -64,6 +64,24 @@ func (t *Clock) Start() {
 	default:
 	}
 	close(t.start)
+}
+
+// Stop stops the ticks
+func (t *Clock) Stop() {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	if t.stop == nil {
+		return
+	}
+	select {
+	case _, open := <-t.stop:
+		if !open {
+			return
+		}
+	default:
+	}
+	close(t.stop)
 }
 
 // Tick makes one tick of the clock
@@ -85,17 +103,6 @@ func (t *Clock) run() *Clock {
 	return t
 }
 
-// Stop stops the ticks
-func (t *Clock) Stop() {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
-	if t.stop != nil {
-		close(t.stop)
-		t.stop = nil
-	}
-}
-
 // Wall adapts a regular time.Tick to return a clock
 func Wall(tick <-chan time.Time) *Clock {
 	out := make(chan Tick)
@@ -109,7 +116,10 @@ func Wall(tick <-chan time.Time) *Clock {
 
 	clock.driver = func() {
 		<-clock.start
+
+		clock.lock.Lock()
 		clock.start = nil
+		clock.lock.Unlock()
 
 		for {
 			select {
