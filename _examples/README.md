@@ -28,12 +28,13 @@ In this example, two resources are being tracked by the server if the server is 
 
 ```
 # cd to the top level directory of the project
+cd ..
 make -k _examples/simple
 ```
 
 ### Running
 ```
-cd _example
+cd _examples
 simple - :9091                # starts server at :9091 and tracks nothing.
 simple simple-7070.conf :7070 # starts at :7070 and tracks what's in conf file
 ```
