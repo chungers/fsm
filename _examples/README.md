@@ -27,15 +27,15 @@ In this example, two resources are being tracked by the server if the server is 
 ### Building
 
 ```
-cd example
-make -k
+# cd to the top level directory of the project
+make -k _examples/simple
 ```
 
 ### Running
 ```
-cd example
-build/simple - :9091                # starts server at :9091 and tracks nothing.
-build/simple simple-7070.conf :7070 # starts at :7070 and tracks what's in conf file
+cd _example
+simple - :9091                # starts server at :9091 and tracks nothing.
+simple simple-7070.conf :7070 # starts at :7070 and tracks what's in conf file
 ```
 
 ### Scenario
@@ -96,7 +96,7 @@ are:
 Starting the :7070 will eventually start up the entire graph of servers:
 
 ```
-build/simple simple-7070.conf :7070
+simple simple-7070.conf :7070
 ```
 
 Here's an example of the watch sessions:
@@ -104,5 +104,4 @@ Here's an example of the watch sessions:
 ![screen](screen.png)
 
 
-
-  
+ 
