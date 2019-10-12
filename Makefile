@@ -55,8 +55,7 @@ clean:
 define binary_target_template
 $(1): $(1).go lint vet test
 	@$(eval HASH := $(shell git hash-object $(1).go))
-	@echo "+ build/$(1) hash=$(HASH)"
-	@mkdir -p build
+	@echo "+ building $(1) hash=$(HASH)"
 ifneq (,$(findstring .m,$(VERSION)))
 		@echo "\nWARNING - repository contains uncommitted changes, tagged binaries as dirty\n"
 endif
