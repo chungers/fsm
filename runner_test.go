@@ -67,9 +67,9 @@ func TestSetDeadlineTransition(t *testing.T) {
 		for i := 0; i < len(instances); i++ {
 			switch instances[i].State() {
 			case wait:
-				waiters += 1
+				waiters++
 			case running:
-				runners += 1
+				runners++
 			}
 		}
 		return
@@ -221,7 +221,7 @@ func TestSetFlapping(t *testing.T) {
 			if _, has := out[s]; !has {
 				out[s] = 0
 			}
-			out[s] += 1
+			out[s]++
 		}
 		return
 	}

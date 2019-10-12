@@ -450,7 +450,7 @@ func (a *simple) provision(target string) error {
 	p := strings.Split(cmd, " ")
 
 	if p[0] == "build/simple" {
-		// !!!! This works only if you run from the examples directory !!!
+		// !!!! This works only if you run from the _examples directory !!!
 		p[0] = filepath.Join(a.pwd, p[0]) // make sure the path exists
 	}
 
